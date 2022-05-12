@@ -3,16 +3,18 @@ package main
 import (
 	// "context"
 	// "crypto/ecdsa"
-	//"go-aave/scripts/aave"
-	"go-aave/cmd/connect"
+
+
 	"go-aave/scripts/aave"
+	"math/big"
 
 	"log"
-	"math/big"
 
 	// "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	// "github.com/ethereum/go-ethereum/crypto"
+
 	"github.com/ethereum/go-ethereum/common"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -53,60 +55,44 @@ Global Steps
 // 	loaner        common.Address
 // }
 
-const pk = "0x83dd616d3db5da014aeea76a32cce1ae57c4a5f89be0a9eb5f1acb6b519e1a03"
+const pk = "7aa1eea0195e3755bd6949ade6686fd8a3e8adcefa7c6797c0efbf473e88322e"
 func main() {
-	const fuji = "https://api.avax-test.network/ext/bc/C/rpc"	
+	const fuji = "wss://speedy-nodes-nyc.moralis.io/8f7573e4ff0324155dcbec2e/avalanche/testnet/ws"	
 
 	blockchain, err := ethclient.Dial(fuji) // ganache
 	if err != nil {
 		log.Fatal(err)
 	}
-	signer := connect.GetSigner(blockchain, pk)
-	amount := big.NewInt(1)
-	loaner_address := "0x1Dd092B79C0c340A0EBd9B90ec190D540091Ed24"
+
+	// signer := connect.GetSigner(blockchain, "7aa1eea0195e3755bd6949ade6686fd8a3e8adcefa7c6797c0efbf473e88322e")
+	loaner_address := "0x5AC42D67bab747677FD5B5156258bB65fFB1e275"
 	loaner := common.HexToAddress(loaner_address)
 
 
-	// // 2. Connect any account to make the transaction to transfer eth
-	// // Load Private Keys
-	// private, err := crypto.HexToECDSA("0520d203bb14d44929b0759412c14741b1ae38dfc566560629ddb1bcea906db7")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// public := private.Public()
-	// publicECDSA, ok := public.(*ecdsa.PublicKey)
-	// if !ok {
-	// 	log.Fatal("error casting public ket to EDCSA")
-	// }
-
-	// fromAddress := crypto.PubkeyToAddress(*publicECDSA)
-
-	// nonce, err := blockchain.PendingNonceAt(context.Background(), fromAddress)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// gasPrice, err := blockchain.SuggestGasPrice(context.Background())
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// // this will do the transaction set for you
-	// deployer := bind.NewKeyedTransactor(private)
-	// deployer.Nonce = big.NewInt(int64(nonce))
-	// deployer.Value = big.NewInt(0)     // in wei
-	// deployer.GasLimit = uint64(300000) // in units
-	// deployer.GasPrice = gasPrice
+	amount := big.NewInt(1000000000000000000)
 
 
-	// utils.Get_AVAX_Balance(blockchain, loaner.String())
+	// // get pool address
+	// 	// Load Pool Contract
+	// 	Pool, err := aave_pool.NewAavePool(pool_address, blockchain)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+
+	// depositEth
+
+	
 	// connect.GetDAIBalance(blockchain, loaner.String())
 	// connect.GetUSDCBalance(blockchain, loaner.String())
+
 	// utils.GetWETH_Address()
 	
-	aave.DepositAVAX(signer, amount, loaner) // signer *bind.TransactOpts, amount *big.Int, loaner common.Address
-	// aave.DepositDAI(signer, amount, loaner) // signer *bind.TransactOpts, amount *big.Int, loaner common.Address
+	// Deposit Avax || Withdraw Avax
+	// aave.DepositAVAX(blockchain, loaner.String(), pk)
+		aave.WithdrawAvax(blockchain, loaner.String(), pk, amount)
+
+
+	// aave.DepositDAI(blockchain, signer, amount, loaner) // signer *bind.TransactOpts, amount *big.Int, loaner common.Address
 	// aave.DepositUSDC(signer, amount, loaner) // signer *bind.TransactOpts, amount *big.Int, loaner common.Address
 	// aave.DepositUSDT(signer, amount, loaner) // signer *bind.TransactOpts, amount *big.Int, loaner common.Address
 	// aave.Borrow()
