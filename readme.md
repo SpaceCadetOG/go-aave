@@ -33,8 +33,6 @@ abigen --abi=./build/BalanceCheck.abi  --bin=./build/BalanceCheck.bin --pkg=api 
 
 # Solc-Select
 - switch compiler
-
-
 * *How to connect with Smart-contract*
 1. Connect with EVM or (Ganache).
 2. Connect any account to make the transaction.

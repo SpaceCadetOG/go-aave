@@ -16,6 +16,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+
+
 const fuji = "https://api.avax-test.network/ext/bc/C/rpc"
 
 func ConnectSigner() *ethclient.Client {

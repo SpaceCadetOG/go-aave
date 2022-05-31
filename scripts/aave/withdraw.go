@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"go-aave/aave_lending_eth"
 	"go-aave/cmd/connect"
+	"go-aave/erc20"
+	"go-aave/scripts/utils"
 
 	"go-aave/pool_address_provider"
 	"go-aave/weth"
@@ -20,6 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+// For withdrawETH you need to approve aWETH for wethgateway
 func WithdrawAvax(blockchain *ethclient.Client, loaner_address string, pk string, amount *big.Int) {
 	fmt.Printf("Withdrawing %v funds from Aave", amount)
 	const token_address = "0x18eE6714Bb1796b8172951D892Fb9f42a961C812"
@@ -99,16 +102,6 @@ func WithdrawAvax(blockchain *ethclient.Client, loaner_address string, pk string
 	println("Approved!")
 
 
-	signedTx_1, err := types.SignTx(wavax_tx_approve, types.NewEIP155Signer(chainID), private)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("Allowance: %v!" ,wavax_tx_approve)
-
-	fmt.Printf("Approve TX: https://testnet.snowtrace.io/tx/%s\n", signedTx_1.Hash().Hex()) // tx sent: 0x8d490e535678e9a24360e955d75b27ad307bdfb97a1dca51d0f3035dcee3e870
-
-
 	fmt.Println("Here is the Pool Address:", pool_address.String())
 	println("Current Balances...")
 	connect.GetAVAXBalance(blockchain, loaner.String())
@@ -136,7 +129,57 @@ func WithdrawAvax(blockchain *ethclient.Client, loaner_address string, pk string
 	_ = wavax
 }
 
-func WithdrawAllAvax() {
-	fmt.Println("Withdrawing All funds from Aave")
 
+func WithdrawAllAvax(blockchain *ethclient.Client, deployer *bind.TransactOpts, token_address common.Address) {
+	fmt.Println("Withdrawing All funds from Aave")
+	dai := common.HexToAddress("0xFc7215C9498Fc12b22Bc0ed335871Db4315f03d")
+	wgw_address := common.HexToAddress("0x8f57153F18b7273f9A814b93b31Cb3f9b035e7C2")
+	// wgw, err := aave_lending_eth.NewAaveLendingEth(wgw_address, blockchain)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	go utils.Approve_ERC20(blockchain, deployer, wgw_address, dai)
+
+	// Approve(blockchain, deployer, token_address, wgw_address)
+
+	// time.Sleep(20 * time.Second)
+	// withdraw_tx, err := wgw.WithdrawETH(deployer, wgw_address, deployer.Value, deployer.From)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// println("Withdraw...")
+	// bind.WaitMined(context.Background(), blockchain, withdraw_tx)
+	// println("Withdrawd!")
+	// fmt.Printf("tx sent: https://testnet.snowtrace.io/tx/%s\n", withdraw_tx.Hash().Hex()) 
+
+	// wavax.Approve(nil, )
+
+	// call wethgateway
+}
+
+
+func Approve(blockchain *ethclient.Client, deployer *bind.TransactOpts, token_address common.Address, pool common.Address) {
+	
+	a_token, err := erc20.NewErc20(token_address, blockchain)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	approve_token, err := a_token.Approve(deployer, pool, big.NewInt(0))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	token_allowance, err := a_token.Allowance(nil, deployer.From, pool)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
+	println("Approving...")
+	bind.WaitMined(context.Background(), blockchain, approve_token)
+	fmt.Printf("Approved! tx sent: https://testnet.snowtrace.io/tx/%s\n", approve_token.Hash().Hex()) 
+	fmt.Printf("Allowance: %v!", token_allowance)
 }

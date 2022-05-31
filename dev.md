@@ -28,3 +28,6 @@ HD Wallet
 ==================
 Mnemonic:      soft alpha student powder unit moment library cat false stuff grocery praise
 Base HD Path:  m/44'/60'/0'/0/{account_index}
+
+
+These are fake address...DO NOT USE IN PRODUCTION
